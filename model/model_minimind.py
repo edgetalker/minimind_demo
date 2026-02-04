@@ -177,6 +177,7 @@ class Attention(nn.Module):
             output = F.scaled_dot_product_attention(xq, xk, xv, dropout_p=self.dropout if self.training else 0.0, is_causal=True)
         else:
             scores = (xq @ xk.transpose(-2, -1)) / math.sqrt(self.head_dim)
+            # [bsz, num_heads, seq_len, seq_len]
             scores[:, :, :, -seq_len:] += torch.triu(torch.full((seq_len, seq_len), float("-inf"), device=scores.device), diagonal=1)
 
             if attention_mask is not None:
@@ -190,7 +191,7 @@ class Attention(nn.Module):
         
         output = output.transpose(1, 2).reshape(bsz, seq_len, -1)
         output = self.resid_dropout(self.o_proj(output))
-        return scores @ xv
+        return output, past_kv
 
 class FeedForward(nn.Module):
     def __init__(self, config: MiniMindConfig):
