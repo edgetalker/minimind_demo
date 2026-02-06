@@ -241,7 +241,7 @@ class MoEGate(nn.Module):
         # [bsz, seq_len, top_k]
         topk_weight, topk_idx = torch.topk(scores, k=self.top_k, sorted=False)
 
-        if self.topk > 1 and self.norm_topk_prob:
+        if self.top_k > 1 and self.norm_topk_prob:
             denominator = topk_weight.sum(dim=-1, keepdim=True) + 1e-20
             topk_weight = topk_weight / denominator
         
@@ -357,7 +357,7 @@ class MiniMindModel(nn.Module):
         self.config = config
         self.vocab_size, self.num_hidden_layers = config.vocab_size, config.num_hidden_layers
         self.embed_tokens = nn.Embedding(config.vocab_size, config.hidden_size)
-        self.dropout = nn.Dropout(self.dropout)
+        self.dropout = nn.Dropout(config.dropout)
         self.layers = nn.ModuleList([MiniMindBlock(l, config) for l in range(self.num_hidden_layers)])
         self.norm = RMSNorm(config.hidden_size, eps=config.rms_norm_eps)
 
@@ -392,7 +392,6 @@ class MiniMindModel(nn.Module):
                 hidden_states,
                 prosition_embeddings,
                 past_key_values=past_key_values,
-                use_cache=past_key_values,
                 use_cache=use_cache,
                 attention_mask=attention_mask
             )
@@ -408,9 +407,10 @@ class MiniMindForCausalLM(PreTrainedModel, GenerationMixin):
 
     def __init__(self, config: MiniMindConfig = None):
         self.config = config or MiniMindConfig()
-        super.__init__(self.config)
+        super().__init__(self.config)
         self.model = MiniMindModel(self.config)
         self.lm_head = nn.Linear(self.config.hidden_size, self.config.vocab_size, bias=False)
+        # 权重共享
         self.model_embed_tokens.weight = self.lm_head.weight
 
     def forward(self,
