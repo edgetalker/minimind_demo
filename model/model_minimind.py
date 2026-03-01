@@ -136,7 +136,7 @@ class Attention(nn.Module):
         assert args.num_attention_heads % args.num_key_value_heads == 0
         self.n_local_heads = args.num_attention_heads
         self.n_local_kv_heads = self.num_key_value_heads
-        self.n_rep = self.n_local_heads // args.n_local_kv_heads
+        self.n_rep = self.n_local_heads // self.n_local_kv_heads
         self.head_dim = args.hidden_size // args.num_attention_heads # query向量投影子空间
 
         self.q_proj = nn.Linear(args.hidden_size, args.num_attention_heads * self.head_dim, bias=False)
@@ -406,8 +406,9 @@ class MiniMindForCausalLM(PreTrainedModel, GenerationMixin):
     config_class = MiniMindConfig
 
     def __init__(self, config: MiniMindConfig = None):
-        self.config = config or MiniMindConfig()
-        super().__init__(self.config)
+        config = config or MiniMindConfig()
+        super().__init__(config)
+        self.config = config
         self.model = MiniMindModel(self.config)
         self.lm_head = nn.Linear(self.config.hidden_size, self.config.vocab_size, bias=False)
         # 权重共享
