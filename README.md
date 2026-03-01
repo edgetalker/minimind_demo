@@ -51,7 +51,7 @@ minimind_demo/
 
 | 模块 | 配置 | 说明 |
 |------|------|------|
-| 参数量 | **104M** | hidden_size=512，num_layers=8 |
+| 参数量 | **104M** | hidden_size=768，num_layers=16 |
 | 注意力 | **GQA**（8 头 Q / 2 头 KV） | n_rep=4，KV Cache 显存降低 75% |
 | 位置编码 | **RoPE + YaRN 外推** | 训练长度 2048，推理可外推至 32K |
 | FFN 激活 | **SwiGLU** | gate_proj × up_proj → down_proj |
@@ -118,7 +118,6 @@ FFN → MoEFeedForward
 | `中国的首都是哪里？` | *（续写地理描述）* | `中国的首都是北京。` |
 | `用一句话解释机器学习` | *（随机续写）* | `机器学习是让计算机从数据中自动学习规律的方法。` |
 
-> 📝 **TODO**：运行模型后替换为真实输出（参考下方推理代码）。
 
 ---
 
@@ -134,7 +133,6 @@ FFN → MoEFeedForward
 - **参数效率**：路由专家总参数 4×，但推理时每 token 仅激活 Top-2，计算量与 Dense 持平
 - **训练稳定性**：序列级辅助损失（`seq_aux=True`）+ Top-K 概率归一化（`norm_topk_prob=True`）有效抑制 Expert Collapse
 
-> 📝 **TODO**：补充 Dense vs MoE 收敛曲线对比图。
 
 ---
 

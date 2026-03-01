@@ -74,13 +74,15 @@ import torch.nn.init as init
 import torch.nn.functional as F
 from transformers.activations import ACT2FN
 from typing import Optional, Union, Tuple, List
-from transformers import PretrainedConfig, PreTrainedModel, GenerationMixin
+from transformers import PretrainedConfig
+from transformers.modeling_utils import PreTrainedModel
+from transformers.generation.utils import GenerationMixin
 from transformers.modeling_outputs import CausalLMOutputWithPast
 
 # RMSNorm 代替 LayerNorm -- Root Mean Square 
 class RMSNorm(torch.nn.Module):
     def __init__(self, dim: int, eps: float = 1e-5):
-        super.__init__()
+        super().__init__()
         self.eps = eps
         self.weight = nn.Parameter(torch.ones(dim))
 
@@ -412,7 +414,7 @@ class MiniMindForCausalLM(PreTrainedModel, GenerationMixin):
         self.model = MiniMindModel(self.config)
         self.lm_head = nn.Linear(self.config.hidden_size, self.config.vocab_size, bias=False)
         # 权重共享
-        self.model_embed_tokens.weight = self.lm_head.weight
+        self.model.embed_tokens.weight = self.lm_head.weight
 
     def forward(self,
                 input_ids: Optional[torch.Tensor] = None,
