@@ -389,11 +389,11 @@ class MiniMindModel(nn.Module):
         )
 
         presents = []
-        for layer_id, (layer, past_key_values) in enumerate(zip(self.layers, past_key_values)):
+        for layer_id, (layer, past_key_value) in enumerate(zip(self.layers, past_key_values)):
             hidden_states, present = layer(
                 hidden_states,
                 prosition_embeddings,
-                past_key_values=past_key_values,
+                past_key_value=past_key_value,
                 use_cache=use_cache,
                 attention_mask=attention_mask
             )
