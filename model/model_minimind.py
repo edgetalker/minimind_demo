@@ -383,7 +383,7 @@ class MiniMindModel(nn.Module):
 
         hidden_states = self.dropout(self.embed_tokens(input_ids))
 
-        prosition_embeddings = (
+        position_embeddings = (
             self.freqs_cos[start_pos:start_pos + seq_length],
             self.freqs_sin[start_pos:start_pos + seq_length]
         )
@@ -392,7 +392,7 @@ class MiniMindModel(nn.Module):
         for layer_id, (layer, past_key_value) in enumerate(zip(self.layers, past_key_values)):
             hidden_states, present = layer(
                 hidden_states,
-                prosition_embeddings,
+                position_embeddings,
                 past_key_value=past_key_value,
                 use_cache=use_cache,
                 attention_mask=attention_mask
